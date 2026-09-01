@@ -1,0 +1,233 @@
+:root {
+  --bg-main: #f8fafc;
+  --card-bg: #ffffff;
+  --card-border: #e2e8f0;
+  --input-bg: #ffffff;
+  --input-border: #cbd5e1;
+  --input-focus: #2563eb;
+  --primary-btn: #2563eb;
+  --primary-btn-hover: #1d4ed8;
+  --secondary-btn: #f1f5f9;
+  --secondary-btn-hover: #e2e8f0;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --font-sans: 'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-main);
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-main);
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+/* Clean Light Mode Card Container (No Logos, Clean Flat Box) */
+.human-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  padding: 2.25rem 2.25rem;
+  position: relative;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* Form Input Controls (Light Theme) */
+.form-label-human {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+  display: block;
+}
+
+.input-group-human {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-human {
+  width: 100%;
+  background-color: var(--input-bg) !important;
+  border: 1px solid var(--input-border) !important;
+  border-radius: 8px !important;
+  color: var(--text-primary) !important;
+  padding: 0.65rem 0.9rem !important;
+  font-size: 0.925rem;
+  font-family: var(--font-sans);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.input-human:focus {
+  outline: none !important;
+  border-color: var(--input-focus) !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+  background-color: #ffffff !important;
+}
+
+.input-human::placeholder {
+  color: var(--text-muted) !important;
+}
+
+.toggle-password-btn {
+  position: absolute;
+  right: 0.75rem;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 0.2rem 0.4rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.toggle-password-btn:hover {
+  color: var(--text-primary);
+  background-color: #f1f5f9;
+}
+
+/* Password Strength Bar */
+.strength-meter-container {
+  margin-top: 0.4rem;
+}
+
+.strength-bar-bg {
+  height: 4px;
+  background-color: #e2e8f0;
+  border-radius: 2px;
+  overflow: hidden;
+  display: flex;
+}
+
+.strength-bar-fill {
+  height: 100%;
+  transition: width 0.2s ease;
+}
+
+.strength-text {
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-top: 0.2rem;
+}
+
+/* Buttons (Solid Light Theme) */
+.btn-human-primary {
+  background-color: var(--primary-btn);
+  border: 1px solid var(--primary-btn);
+  color: #ffffff;
+  font-weight: 500;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  padding: 0.65rem 1.25rem;
+  transition: background-color 0.15s ease;
+}
+
+.btn-human-primary:hover {
+  background-color: var(--primary-btn-hover);
+  border-color: var(--primary-btn-hover);
+  color: #ffffff;
+}
+
+.btn-human-primary:disabled {
+  background-color: #94a3b8;
+  border-color: #94a3b8;
+  color: #ffffff;
+  cursor: not-allowed;
+}
+
+.btn-human-secondary {
+  background-color: var(--secondary-btn);
+  border: 1px solid var(--input-border);
+  color: var(--text-primary);
+  font-weight: 500;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  padding: 0.65rem 1.25rem;
+  transition: background-color 0.15s ease;
+}
+
+.btn-human-secondary:hover {
+  background-color: var(--secondary-btn-hover);
+  color: var(--text-primary);
+}
+
+/* Alert Boxes (Clean Flat Fills) */
+.alert-error-box {
+  background-color: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #991b1b;
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+}
+
+.alert-success-box {
+  background-color: #f0fdf4;
+  border: 1px solid #86efac;
+  color: #166534;
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+}
+
+/* Fade animation */
+.fade-in {
+  animation: fadeIn 0.15s ease-out both;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Toast Styling (Light Theme) */
+.Toastify__toast {
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  color: #0f172a !important;
+  font-family: var(--font-sans) !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.Toastify__toast-body {
+  color: #0f172a !important;
+  font-size: 0.875rem !important;
+}
+
+.Toastify__close-button {
+  color: #64748b !important;
+}
