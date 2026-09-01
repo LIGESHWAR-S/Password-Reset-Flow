@@ -14,28 +14,22 @@ const getTransporter = async () => {
   let emailHost = process.env.EMAIL_HOST;
   let emailPort = parseInt(process.env.EMAIL_PORT) || 587;
 
-  // Real Email Mode: If EMAIL_USER and EMAIL_PASS are set in backend/.env
+  // Real Email Mode: SSL Port 465 for instant cloud delivery on Render/AWS
   if (emailUser && emailPass) {
-    if (emailUser.includes('@gmail.com') || process.env.EMAIL_SERVICE === 'gmail') {
-      return nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: emailUser,
-          pass: emailPass
-        }
-      });
-    }
-
     return nodemailer.createTransport({
-      host: emailHost || 'smtp.gmail.com',
-      port: emailPort,
-      secure: emailPort === 465,
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
       auth: {
         user: emailUser,
         pass: emailPass
-      }
+      },
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 10000
     });
   }
+
 
   // Test Mode: Auto-generate Ethereal test credentials if no real credentials in .env
   if (!transporterPromise) {
