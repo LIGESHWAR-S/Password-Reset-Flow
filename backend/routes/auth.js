@@ -57,28 +57,37 @@ const dispatchEmail = async ({ to, subject, html, text }) => {
   const emailUser = process.env.EMAIL_USER;
 
   if (resendApiKey) {
-    const response = await axios.post('https://api.resend.com/emails', {
-      from: 'Security Support <onboarding@resend.dev>',
-      to: [to],
-      subject,
-      html
-    }, {
-      headers: { 'Authorization': `Bearer ${resendApiKey}` }
-    });
-    return { type: 'resend', data: response.data };
+    try {
+      const response = await axios.post('https://api.resend.com/emails', {
+        from: 'Security Support <onboarding@resend.dev>',
+        to: [to],
+        subject,
+        html
+      }, {
+        headers: { 'Authorization': `Bearer ${resendApiKey}` }
+      });
+      return { type: 'resend', data: response.data };
+    } catch (resendErr) {
+      console.warn('[Mailer] Resend API warning (testing mode limit):', resendErr.response?.data || resendErr.message);
+    }
   }
 
   if (brevoApiKey) {
-    const response = await axios.post('https://api.brevo.com/v3/smtp/email', {
-      sender: { name: 'Security Support', email: emailUser || 'sligesh24@gmail.com' },
-      to: [{ email: to }],
-      subject,
-      htmlContent: html
-    }, {
-      headers: { 'api-key': brevoApiKey, 'content-type': 'application/json' }
-    });
-    return { type: 'brevo', data: response.data };
+    try {
+      const response = await axios.post('https://api.brevo.com/v3/smtp/email', {
+        sender: { name: 'Security Support', email: emailUser || 'sligesh24@gmail.com' },
+        to: [{ email: to }],
+        subject,
+        htmlContent: html
+      }, {
+        headers: { 'api-key': brevoApiKey, 'content-type': 'application/json' }
+      });
+      return { type: 'brevo', data: response.data };
+    } catch (brevoErr) {
+      console.warn('[Mailer] Brevo API warning:', brevoErr.response?.data || brevoErr.message);
+    }
   }
+
 
   const transporter = await getTransporter();
   const info = await transporter.sendMail({
