@@ -215,10 +215,12 @@ router.post('/forgot-password', async (req, res) => {
 
     // Gracefully handle Render cloud firewall timeouts or auth errors
     return res.status(200).json({ 
-      message: 'Password reset link generated successfully!',
-      resetLink
+      message: 'Password reset link generated!',
+      resetLink,
+      smtpError: err.message
     });
   }
+
 
 
 
