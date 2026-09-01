@@ -5,16 +5,14 @@ const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const User = require('../models/User');
 
+const axios = require('axios');
+
 // Helper to initialize Nodemailer transporter.
-// If EMAIL_USER and EMAIL_PASS are not specified, it will dynamically create an Ethereal SMTP test account.
 let transporterPromise = null;
 const getTransporter = async () => {
   let emailUser = process.env.EMAIL_USER;
   let emailPass = process.env.EMAIL_PASS;
-  let emailHost = process.env.EMAIL_HOST;
-  let emailPort = parseInt(process.env.EMAIL_PORT) || 587;
 
-  // Real Email Mode: SSL Port 465 for instant cloud delivery on Render/AWS
   if (emailUser && emailPass) {
     return nodemailer.createTransport({
       host: 'smtp.gmail.com',
@@ -30,8 +28,6 @@ const getTransporter = async () => {
     });
   }
 
-
-  // Test Mode: Auto-generate Ethereal test credentials if no real credentials in .env
   if (!transporterPromise) {
     transporterPromise = (async () => {
       console.log('\n\x1b[36m[Mailer] EMAIL_USER/EMAIL_PASS not set in backend/.env. Generating test SMTP credentials...\x1b[0m');
@@ -53,6 +49,48 @@ const getTransporter = async () => {
   }
   return transporterPromise;
 };
+
+// Unified Email Sender with Resend/Brevo HTTP API + SMTP Fallback
+const dispatchEmail = async ({ to, subject, html, text }) => {
+  const resendApiKey = process.env.RESEND_API_KEY;
+  const brevoApiKey = process.env.BREVO_API_KEY;
+  const emailUser = process.env.EMAIL_USER;
+
+  if (resendApiKey) {
+    const response = await axios.post('https://api.resend.com/emails', {
+      from: 'Security Support <onboarding@resend.dev>',
+      to: [to],
+      subject,
+      html
+    }, {
+      headers: { 'Authorization': `Bearer ${resendApiKey}` }
+    });
+    return { type: 'resend', data: response.data };
+  }
+
+  if (brevoApiKey) {
+    const response = await axios.post('https://api.brevo.com/v3/smtp/email', {
+      sender: { name: 'Security Support', email: emailUser || 'sligesh24@gmail.com' },
+      to: [{ email: to }],
+      subject,
+      htmlContent: html
+    }, {
+      headers: { 'api-key': brevoApiKey, 'content-type': 'application/json' }
+    });
+    return { type: 'brevo', data: response.data };
+  }
+
+  const transporter = await getTransporter();
+  const info = await transporter.sendMail({
+    from: `"Security Support" <${emailUser || 'no-reply@auth-system.com'}>`,
+    to,
+    subject,
+    text,
+    html
+  });
+  return { type: 'nodemailer', info };
+};
+
 
 
 // @route   POST /api/auth/register
@@ -162,11 +200,7 @@ router.post('/forgot-password', async (req, res) => {
     resetLink = `${clientUrl}/reset-password/${token}`;
 
 
-    // Get transporter and send mail
-    const transporter = await getTransporter();
-    
-    const mailOptions = {
-      from: '"Security Support" <no-reply@auth-system.com>',
+    const emailResult = await dispatchEmail({
       to: user.email,
       subject: 'Password Reset Request',
       text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n` +
@@ -188,22 +222,24 @@ router.post('/forgot-password', async (req, res) => {
           <p style="font-size: 12px; color: #aaaaaa;">If you did not make this request, you can safely ignore this email. Your password will remain unchanged.</p>
         </div>
       `
-    };
+    });
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log(`\n\x1b[32m[Mailer] Reset email dispatched to ${user.email}\x1b[0m`);
+    console.log(`\n\x1b[32m[Mailer] Reset email dispatched via ${emailResult.type} to ${user.email}\x1b[0m`);
     console.log(`\x1b[36m[Mailer] 🔑 Direct Reset Link:\x1b[0m \x1b[33m${resetLink}\x1b[0m`);
     
     // If using Ethereal, log the preview URL
-    const previewUrl = nodemailer.getTestMessageUrl(info);
-    if (previewUrl) {
-      console.log(`\x1b[35m[Mailer] Ethereal Test Mailbox Link: ${previewUrl}\x1b[0m\n`);
-      return res.status(200).json({ 
-        message: 'Password reset link sent! Check server terminal for direct reset URL or preview mailbox.', 
-        previewUrl,
-        resetLink
-      });
+    if (emailResult.info) {
+      const previewUrl = nodemailer.getTestMessageUrl(emailResult.info);
+      if (previewUrl) {
+        console.log(`\x1b[35m[Mailer] Ethereal Test Mailbox Link: ${previewUrl}\x1b[0m\n`);
+        return res.status(200).json({ 
+          message: 'Password reset link sent! Check server terminal for direct reset URL or preview mailbox.', 
+          previewUrl,
+          resetLink
+        });
+      }
     }
+
 
     res.status(200).json({ message: 'Password reset link sent to your email.' });
 
