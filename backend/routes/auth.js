@@ -149,9 +149,17 @@ router.post('/forgot-password', async (req, res) => {
     user.resetPasswordExpires = expiryTime;
     await user.save();
 
-    // Create reset URL
-    const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+    // Dynamically detect Netlify domain or process.env.CLIENT_URL
+    let clientUrl = process.env.CLIENT_URL;
+    const reqOrigin = req.headers.origin || req.headers.referer;
+    if (reqOrigin && reqOrigin.includes('netlify.app')) {
+      clientUrl = reqOrigin.replace(/\/$/, '');
+    }
+    if (!clientUrl) {
+      clientUrl = 'http://localhost:5173';
+    }
     resetLink = `${clientUrl}/reset-password/${token}`;
+
 
     // Get transporter and send mail
     const transporter = await getTransporter();
