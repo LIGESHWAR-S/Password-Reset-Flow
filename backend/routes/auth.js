@@ -156,8 +156,9 @@ router.post('/forgot-password', async (req, res) => {
       clientUrl = reqOrigin.replace(/\/$/, '');
     }
     if (!clientUrl) {
-      clientUrl = 'http://localhost:5173';
+      clientUrl = 'https://v2-password-reset-flow.netlify.app';
     }
+
     resetLink = `${clientUrl}/reset-password/${token}`;
 
 
