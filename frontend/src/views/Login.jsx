@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { toast } from 'react-toastify'
+import { getApiBaseUrl } from '../apiConfig'
 
 const Login = () => {
   const [email, setEmail] = useState('')
@@ -18,8 +19,8 @@ const Login = () => {
 
     setLoading(true)
     try {
-      const apiHost = window.location.hostname || 'localhost';
-      const response = await axios.post(`http://${apiHost}:5000/api/auth/login`, {
+      const baseUrl = getApiBaseUrl()
+      const response = await axios.post(`${baseUrl}/login`, {
         email,
         password
       })

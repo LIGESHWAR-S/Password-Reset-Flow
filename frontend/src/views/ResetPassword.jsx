@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { toast } from 'react-toastify'
+import { getApiBaseUrl } from '../apiConfig'
 
 const ResetPassword = () => {
   const { token } = useParams()
@@ -19,8 +20,8 @@ const ResetPassword = () => {
   useEffect(() => {
     const verifyToken = async () => {
       try {
-        const apiHost = window.location.hostname || 'localhost';
-        const response = await axios.get(`http://${apiHost}:5000/api/auth/verify-token/${token}`)
+        const baseUrl = getApiBaseUrl()
+        const response = await axios.get(`${baseUrl}/verify-token/${token}`)
         setIsValidToken(true)
         setEmail(response.data.email || '')
       } catch (err) {
@@ -51,8 +52,8 @@ const ResetPassword = () => {
 
     setLoading(true)
     try {
-      const apiHost = window.location.hostname || 'localhost';
-      const response = await axios.post(`http://${apiHost}:5000/api/auth/reset-password/${token}`, {
+      const baseUrl = getApiBaseUrl()
+      const response = await axios.post(`${baseUrl}/reset-password/${token}`, {
         password
       })
 

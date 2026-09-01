@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
 import { toast } from 'react-toastify'
+import { getApiBaseUrl } from '../apiConfig'
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('')
@@ -17,8 +18,8 @@ const ForgotPassword = () => {
 
     setLoading(true)
     try {
-      const apiHost = window.location.hostname || 'localhost';
-      const response = await axios.post(`http://${apiHost}:5000/api/auth/forgot-password`, { email })
+      const baseUrl = getApiBaseUrl()
+      const response = await axios.post(`${baseUrl}/forgot-password`, { email })
       toast.success('Password reset link sent to your email!')
       setSubmitted(true)
       if (response.data.resetLink) {
@@ -69,7 +70,7 @@ const ForgotPassword = () => {
         <div className="text-center fade-in py-2">
           <h3 className="mb-2" style={{ fontSize: '1.4rem' }}>Check Your Email</h3>
           <p className="mb-4 text-secondary">
-            A password reset request has been processed for <strong>{email}</strong>. The link is valid for 15 minutes.
+            We have sent a password reset link to <strong>{email}</strong>. The link is valid for 15 minutes.
           </p>
 
           {resetLink && (
